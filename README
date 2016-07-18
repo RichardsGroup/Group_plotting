@@ -1,0 +1,7 @@
+The File you want to use/write to is entitled "group_plotting_standard.py"
+At the moment, it is simply a set of rc_params
+
+The file "train_colors.py" is an example code that we want to make with the 
+new plotting standard
+
+"test.py' just makes sure that the import of the group plotting code works
