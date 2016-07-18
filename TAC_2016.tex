@@ -1,0 +1,315 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%    TAC 2016
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[onecolumn]{emulateapj}
+%\linespread{2.6}
+\usepackage{graphicx, subfigure}
+\usepackage{amsmath, natbib, listings}
+\usepackage[bottom, hang, flushmargin]{footmisc}
+\usepackage[urlcolor=magenta,citecolor=green,linkcolor=red]{hyperref}
+\usepackage{appendix}
+\usepackage{rotate}
+\usepackage{adjustbox}
+\usepackage{placeins}
+
+%% FOR DOUBLE-SPACE, SINGLE-COLUMN VERSION::
+%\documentclass[onecolumn]{emulateapj}
+%\linespread{2.6}
+%% FOR DOUBLE COLUMN SINGLE SPACE
+%\documentclass[apj]{emulateapj}
+
+\begin{document}
+	
+	\shorttitle{Quasar Clustering}
+	\shortauthors{}
+	
+	\title{Clustering of high-redshift ($2.9 \le \MakeLowercase{z}\le6$) Quasar candidates in the \emph{Spitzer} IRAC Equatorial Survey}
+	
+	\author{
+		John D. Timlin}
+	
+\date{\today}
+
+%\begin{abstract}
+%	We measure the two-point autocorrelation function of photometrically determined quasar candidates from the \emph{Spitzer} IRAC Equatorial Survey (SpIES) in the redshift range $2.9 \le \mathrm{z}\le 6$.
+%\end{abstract}
+
+\clearpage
+
+\section{Introduction}
+
+The formation and evolution of Large Scale Structure remains an active field of research in cosmology today. Current theories suggest that gravitational instability due to perturbations in the dark matter (DM) density field caused the initial formation of structure in the primordial universe. Growth, then, happened in a hierarchical way; first, gravitational collapse occurred on small scales which progressed on to larger scales \citep{Smith2003}. Simulations of the DM power spectrum (and, by means of Fourier transform, correlation function) predict the evolution of the DM density field on these scales and throughout cosmic time. DM, however, has yet to be observed directly, so measurement of this structure and evolution must be carried out through a different medium.  
+
+Quasars are super-massive black holes (SMBH) that are actively accreting material at the center of massive galaxies \citep{LyndenBell1969}. The current quasar paradigm suggests that every massive galaxy underwent a quasar phase, and that quasar activity is a result of major mergers of galaxies \citep{Hopkins2007a}. A portion of the perturbed gas and dust due to the merger falls into the center of the galaxy, forming a disk around the SMBH. Collisions in the gas result in the disk heating to extremely high temperatures causing it to shine and to lose angular momentum, causing the gas to fall in toward the SMBH. Quasars are so energetic and bright that they can be observed at much further distances than typical galaxies. This makes them perfect subjects to measure the evolution of structure at early times.
+
+Quasars that exist in the early universe are thought to have formed in peaks of the DM density field, which make them good tracers of the underlying DM distribution. The clustering of quasars have been measured using a statistical technique called the two-point autocorrelation function and is linearly related to the DM correlation function as:
+
+\begin{equation}
+\xi_Q = b^2 \xi_{DM} .
+\end{equation}\label{bias}
+
+Here, $\xi_Q$ is the observed quasar correlation function, $\xi_{DM}$ is the theoretical DM correlation function, and $b^2$ is the bias \citep{Peebles1980}. Being the relation between theory and measurement, the bias can be used to estimate numerous physical quantities that we cannot measure directly such as DM halo mass and quasar duty cycle (i.e.,\ the fraction of the time that the quasar is shining). Additionally, studying the evolution of bias with respect to cosmic time (i.e.,\ redshift) can help shed light on the relationship between active galactic nuclei (AGN) and their host galaxies. For example, measurement of the bias, particularly at high redshift, can help constrain the effect that AGN feedback has on it's host galaxy \citep{Hopkins2007a}. AGN feedback is believed to play a role in suppression of star formation by sweeping gas out of the host galaxy, effectively halting galactic evolution. Different models can predict vastly different roles of feedback on the host galaxy, which, in turn, affects our understanding of how these massive galaxies evolved.
+
+While quasar clustering measurements at low redshift ($z\le2$) are very well constrained, measurements at high redshift contain a lot of scatter due to a small sample size of quasars. My initial goals are to use the multi-dimensional selection technique of \citet{Richards2015} to compile a catalog of quasar candidates at high redshift ($3.5\le z\le5$) with which to compute the quasar correlation function and estimate the bias. I will discuss the data I used to do this in Section \ref{Data} as well as give a general overview of the selection routine. In Section \ref{corr_funct}, I discuss some clustering theory and show some of the first steps I took to make a measurement. I will then compare the code I wrote with results in the literature in Section \ref{first_results}. Finally, I will briefly outline some of the future work I hope to do and that can be done in Section \ref{future_work}.  
+
+
+\clearpage
+
+\section{Quasar Sample}\label{Data}
+Clustering measurements are well constrained for both low-redshift (z$\le2$; e.g.,\ \citealt{Ross2009}) and intermediate-redshift ($2\le \mathrm{z}\le3$; e.g.,\ \citealt{Eftekharzadeh2015}) optically selected quasars, however measurements at high-redshift (z$\ge 3$; \citealt{Shen2007}) are more uncertain due to low number densities of confirmed, high-redshift quasars in both the optical and infrared wavelengths. Observations in optical wavelengths can have trouble detecting these faint quasars (surveys are flux-limited) and, when they are detected, classification is difficult because they have similar colors to stars. Additionally, infrared surveys lack either the depth or solid angle to detect large quantities of these objects to perform clustering measurements. Classification of high-redshift quasars using their optical and infrared colors combined, however,  has proven successful in detecting a large number of high-redshift quasar candidates \citep{Richards2015}. \citet{Richards2015} combined  optical data from the Sloan Digital Sky Survey (SDSS; \citealt{York2000}), and infrared data from the Wide-field Infrared Survey Explorer (\emph{WISE}; \citealt{Wright2010}) to generate a catalog of quasar candidates. We employ the same technique to this study, except we combine the SDSS data with much deeper infrared data from the \emph{Spitzer} IRAC Equatorial Survey (SpIES; \citealt{Timlin2016}).
+
+\subsection{SDSS Data}
+Photometric and spectroscopic data from the SDSS are taken in five optical bands ($ugriz$; \citealt{Fukugita1996}) using a 2.5m drift-scan telescope at Apache Point, New Mexico \citep{York2000}. Over its $\sim$18 year lifetime, SDSS has imaged over 14,500 square degrees on the sky and has taken over 470,000 quasar spectra. Though SDSS studies the all objects in the sky, its high-quality photometric data and spectra remain at the forefront of quasar detection and classification.
+
+We particularly focus on the SDSS field Stripe 82 (S82; \citealt{Stoughton2002}), which has been targeted many more times by SDSS than any other field. Originally intended to observe variable objects, S82 is frequently targeted when the Northern Galactic Cap is out of view \citep{York2000}. The stacked optical photometric data on S82 reaches approximately two magnitudes fainter than the rest of the survey (\citealt{Annis2014}; \citealt{Jiang2014}), and is therefore an ideal data set to hunt for faint, high-redshift quasars. S82 has also been targeted with the SDSS spectrograph along with many other optical spectrometers, yielding $\sim$125,000 spectra across its full area (\citealt{Timlin2016} and references therein). S82 has also been the target of observation of surveys in just about every wavelength (see Figure \ref{spies_footprint} and Table 2 in \citealt{Timlin2016}). This multi-wavelength data is important to paint a complete picture of objects in that field, particularly for quasars which shine in just about every wavelength. Quasar selection based on multi-wavelength colors has proven to efficiently find quasars with a very high reliability. This is particularly the case when analyzing both the optical and mid-infrared colors in tandem \citep{Richards2015}.
+
+\subsection{SpIES Data}
+SpIES was designed to probe deep enough to detect high-redshift quasars and to span sufficient area to perform clustering analyses \citep{Timlin2016}. Covering $\sim$100 square degrees of S82 (see Figure \ref{spies_footprint}), SpIES is the largest \emph{Spitzer} survey to date. Sampling as large an area as possible is critical to get a clustering result, however to obtain a high-redshift population, we also require deep infrared data. The all-sky \emph{WISE} survey (which was used in \citealt{Richards2015} for classification) certainly has sufficient area to perform clustering, however, as shown by Figures \ref{ch2w2} and \ref{spies_colors}, it lacks the resolution and depth to recover high-redshift quasars; depth that SpIES achieves. 
+
+To show this, \citet{Timlin2016} matched the SpIES data to spectroscopically confirmed quasars of all redshifts in S82 and found that SpIES reliably recovers objects to 22nd magnitude in the $i$-band and at redshift 6 (shown in Figure \ref{spies_detections}). Additionally, SpIES recovers 94\% of confirmed quasars on S82 with z$\ge3.5$ and, as seen in Figure \ref{spies_colors}, SpIES has the capability to detect even more, unknown high-z quasars.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\textwidth]{f1.pdf}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Top: A 100 $\mu$m dust map of the S82 footprint with many of the multi-wavelength footprints enclosed by polygons (see \citealt{Timlin2016} for more detail. Bottom: A zoom in of the SpIES footprint (yellow and purple) and the footprint of \emph{Spitzer's} SHELA survey \citealt{Papovich2011}.}}
+	\label{spies_footprint}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\textwidth]{ch2_w2_inverted.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{A comparison of a SpIES image (left) and a \emph{WISE} image (right) of the same section of the sky. Simply looking at this image demonstrates that SpIES has both superior resolution and depth to \emph{WISE}. In this region, SpIES detects $\sim$1400 objects to the $\sim$350 of \emph{WISE} \citep{Timlin2016}.}}
+	\label{ch2w2}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.60\textwidth]{f15.pdf}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Color as a function of magnitude in the \emph{Spitzer} IRAC detection passbands. Purple contours show all objects in the SpIES catalogs that have good flags. Also shown is the location where known stars (blue contours), low-redshift quasars (orange contours), and high-redshift quasars (red contours) lie in this color space. Objects that lie within the black dashed box are objects that are classified as quasars using \emph{WISE} color cuts. Note that the majority of high-redshift quasars like outside of this box, yet are over top of the SpIES contours, demonstrating that SpIES is properly sampling this color space for high-redshift quasar detection.}}
+	\label{spies_colors}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.45\textwidth]{f17a.pdf}
+	\includegraphics[width=0.45\textwidth]{f17b.pdf}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Both plots are the results of matching SpIES and \emph{WISE} to known quasars in SDSS. On the left we plot the number of matches with respect to redshift, and inset is the recovery fraction (number recovered/number in SDSS). We show that SpIES has a significantly larger recovery fraction, particularly at high-redshift than does \emph{WISE}. Right: We plot the same matches as a function of $i$-band magnitude, with the inset plot showing the recovery fraction at each magnitude. Notice again that SpIES detects significantly fainter (larger values) than \emph{WISE}.}}
+	\label{spies_detections}
+\end{figure}
+
+
+\subsection{Quasar Candidates}
+While both the optical and infrared data that we use are deep enough to detect high-redshift quasars, they cannot independently classify such objects. The optical colors alone can be used to detect quasars up to a particular redshift, however high-z quasar colors are located in the same place as red stars and thus cannot be cleanly identified. From Figure \ref{spies_colors}, we see that it would be difficult to isolate high-z quasars from stars using SpIES colors alone; however, using the deep optical and infrared data together, we can begin to classify high-redshift quasars.
+
+Following the multidimensional selection algorithm from \citet{Richards2015}, we create a training set of known quasars and a test set of objects we wish to classify. The training set is comprised of objects that have both infrared and optical photometric information and are spectroscopically confirmed as high-redshift quasars, whereas the test set is only comprised of the optical/infrared photometric data without spectroscopic information. Objects in the test set are assigned probabilities of being a quasar based off of their locations in multidimensional color space using the color information from the training set as prior knowledge. The candidates are also assigned photometric redshifts by minimizing the multi-dimensional color of the candidate with the mean color as a function of redshift (see \citealt{Richards2015} and references therein). In the case of luminous quasars, the method of \citealt{Richards2015} performed better than classical template fitting. 
+
+Gordon had this code readily available, and ran it with the SpIES objects. I was given a catalog of candidates with photometric redshifts and positions on the sky. In total, there are 4,992 high-redshift quasar candidates in the SpIES footprint, spanning $\sim$100 square degrees. While this code was running and the catalog was being made, I was writing code to compute the correlation function(s) discussed in the next section. 
+
+\clearpage
+
+\section{Correlation function}\label{corr_funct}
+
+The two-point autocorrelation function (2PCF) is a statistic that quantifies the excess probability above random of finding two objects separated by a distance $r$ in a volume element $dV$ \citep{Peebles1980}. Mathematically, it can be written:
+
+\begin{equation}
+dP = n^2 (1+\xi(r))dV
+\end{equation}
+
+where $P$ is the probability, $n$ is the number density, and $\xi(r)$ is the correlation function. To compute the 2PCF directly, we use the Landy-Szalay (LS) estimator presented in \citet{Landy1993} which compares the data with a larger number of points (we used a factor of $\sim$50 more) randomly distributed across the footprint. The 2PCF is calculated by counting the number of data-data (DD), data-random (DR), and random-random (RR) pairs that fall within annuli of increasing radii and evaluating the equation:
+
+\begin{equation}
+\xi(s) = \frac{<DD>-2*<DR>+<RR>}{<RR>} = \left(\frac{N_{rnd}}{N_{dat}}\right)^2\frac{DD}{RR} - 2\left(\frac{N_{rnd}}{N_{dat}}\right)\frac{DR}{RR}+1
+\end{equation}\label{LS_EST}
+where the pair count is normalized by the total number of points in the data set ($N_{dat}$) or the random set ($N_{rnd}$). Though the number of points is normalized, it is imperative that the random catalog have the exact same spatial boundary constraints as the data to ensure that we are randomly sampling the same space as our data.
+
+\subsection{Random Catalog}
+Since our measurement of the 2PCF is dependent on the random catalog, we must carefully define the angular mask of the SpIES field, and we must ensure that our random points have the same redshift distribution as the data. We used the MANGLE software \citep{Swanson2008} to define the footprint of the SpIES survey. MANGLE allows the user create complex angular masks by adding together a series of spherical caps to form different shaped polygons. These polygons can be weighted (to allow for holes to be excluded in the angular mask) and then snapped together forming a single enclosed area on the surface of a sphere. MANGLE can then be used to generate a random catalog of RA and DEC values, all of which lie within that defined area, but do not overlap with polygons with zero weight (holes).
+
+The SpIES angular mask was the sum of rectangles defining the boundaries of each observation, and circles (holes) which were used to mask bright stars, ensuring we do not lay any random points in those locations. The results are shown in Figure \ref{MANGLE}, where we have overlaid random points over top of the SpIES data. We see that the random values avoid all of the holes in the original data, yet cover the mask everywhere else.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\textwidth]{SpIESdata_plusqso.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Using MANGLE, we can place random objects in rather complex angular masks. Shown here is the angular mask of the SpIES data (red points) with contaminated regions from bright stars cut out (the holes in the red). Random objects (blue points) are placed in this angular mask using MANGLE, however blue points are not placed outside the complex edges or in the holes shown in the data. We can therefore say that the random objects are properly sampling the SpIES footprint.}}
+	\label{MANGLE}
+\end{figure}
+
+Secondly, we had to match the redshift distribution of the random catalog from MANGLE with the photometric redshift distribution of the data. This ensures that our random quasars sample the same space in distance (and time) as the data. To do so, we draw random values from the redshift distribution of the data and assign these values to a pair of RA and DEC values from MANGLE. Figure \ref{randz} shows that the redshift distribution of the SpIES data and the random catalog overlap, once again, ensuring that we are sampling the same space.
+
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\textwidth]{random_z.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{After the footprint is well sampled by the random catalog, we must ensure that the randoms have the same redshift distribution as the data. Shown is the result of generating random redshfits (green) pulled from the data distribution (blue).}}
+	\label{randz}
+\end{figure} 
+
+
+
+\subsection{Redshift-Space Correlation Function}
+To compute the redshift space correlation function, we must convert the RA, DEC and redshift information into a Cartesian coordinate system to begin pair counting. The conversion is the same as converting spherical coordinates to Cartesian coordinates:
+
+\begin{flalign}
+x &= \chi * cos(RA)*sin(DEC) \\
+y &=  \chi * sin(RA)*sin(DEC) \\
+z &=  \chi *sin(DEC)             
+\end{flalign}
+
+where $\chi$ is the comoving distance to an objects, defined by:
+
+\begin{equation}
+\chi = \frac{c}{H_0} \int_{0}^{z}\frac{dz}{\sqrt{\Omega_M (1+z)^3 + \Omega_\Lambda}}
+\end{equation}
+
+where $c/H_0=3000h^{-1}$Mpc is the Hubble Distance, $\Omega_M=0.274$ is the matter density parameter, and $\Omega_\Lambda = 0.726$ is the dark energy parameter (cosmological constant). After conversion, we count the number of DD, DR, RR pairs of objects within a particular radius, $s$ (computed using the 3D Pythagorean Theorem), and plug those values into Equation \ref{LS_EST} to compute the redshift space correlation function. 
+
+Errors were computed using Jackknife resampling, which is a technique splits the data and random catalogs into N pixels then, using N-1 of those pixels, re-compute the correlation function. This is done N times, ensuring that each pixel is omitted from the calculation. The covariance matrix can then be computed as:
+
+\begin{equation}
+C_{ij} = \sum_{n=1}^{N}\sqrt{\frac{RR_n(s_i)}{RR(s_i)}}[\xi_n(s_i)-\xi(s_i)] \times \sqrt{\frac{RR_n(s_j)}{RR(s_j)}}[\xi_n(s_j)-\xi(s_j)]
+\end{equation}
+where the ratio $RR_n/RR$ normalizes the number of objects in the subsample with that in the full sample, $\xi_n(s_i)$ is the correlation function computed leaving the nth pixel out, and $\xi(s_i)$ is the full correlation function at $s_i$. The variance of each $\xi(s_i)$ measurement is, then, $ \sigma_i^2 = C_{ii}$ (see \citealt{Myers2007} for more detail).
+
+
+\subsection{The Real-Space Correlation Function}
+If the motion of quasars in the Universe was purely due to Hubble expansion, the redshift space correlation function would accurately measure the distribution of quasars in the Universe. There are, however, small velocity dispersions of quasars in clusters caused by gravitational in-fall that distort the measured redshift, and thus skew our calculation for their position is space. We must therefore calculate the real-space correlation function to get an accurate measure of the distribution of quasars.
+
+Computing the real-space correlation function requires us to convert our existing coordinate frame into a new, 2-dimensional frame consisting of a direction parallel to the line of sight (referred to as $\pi$ in the literature) and a direction perpendicular to the line of sight (called $r_p$ or $\sigma$ in the literature; \citealt{DaAngela2008}). We can in fact translate the Cartesian coordinates that we computed into this new coordinate frame, using the equations:
+
+\begin{flalign}
+\pi &= |s_1 - s_2| cos(\frac{\theta}{2}) \\
+r_p &= (s_1 + s_2) sin(\frac{\theta}{2})
+\end{flalign}
+where $s_1$ and $s_2$ are the scalar distances from the Cartesian origin to quasar 1 and quasar 2 respectively and $\theta$ is the angle between the two vectors. Redshift space distortions occur on very small angular scales, thus we can approximate $sin(\theta/2)=\theta/2$ and $cos(\theta/2)=1$. The distance between two quasars can then be written as $s^2 = \pi^2 + r_p^2$. After this coordinate transformation, the 2 dimensional correlation function $\xi(r_p,\pi)$ can be calculated as before in Equation \ref{LS_EST} but iterating over both $r_p$ and $\pi$ instead of just $s$. 
+
+To eliminate the dependence on redshift in our measurement, we can project the correlation function such that our measurement is only dependent on $r_p$. To calculate this projected correlation function, we simply integrate along the $\pi$ direction \citep{Davis1983}.
+
+
+\begin{eqnarray}
+w_p(r_p) = 2\int_{0}^{\infty}\xi(r_p,\pi) d\pi
+\end{eqnarray}
+
+\citet{Davis1983} further assume that the real space correlation function is a power law of the form $\xi(r) = (r/r_{0})^{- \gamma}$, and thus can be related to the projected correlation function as:
+
+\begin{equation}
+w_p(r_p) = 2\int_{0}^{\infty}\frac{r\xi(r)}{\sqrt{r^2-r_p^2}}dr 
+\end{equation}\label{proj_cor}
+
+when substituting a power-law in for $\xi(r)$, the integral in Equation \ref{proj_cor} evaluates to:
+
+\begin{equation}
+\frac{w_p(r_p)}{r_p} = \left(\frac{r_0}{r_p}\right)^{\gamma} \left[ \frac{\Gamma(\frac{1}{2}\Gamma(\frac{(\gamma-1)}{2}))}{\Gamma(\frac{\gamma}{2})}\right]
+\end{equation}\label{wp_fit}
+Simply fitting our measurements to the free parameters in Equation \ref{wp_fit} ($r_0$ and $\gamma$) gives us a good approximation of the real-space correlation function.
+
+The real-space correlation function can also be related to the redshift-space correlation function using linear theory \citep{Kaiser1987} as:
+
+\begin{equation}\label{lin_th}
+\xi(s) = \left(1+\frac{2}{3}\beta(z)+\frac{1}{5}\beta(z)^2\right)\xi(r),
+\end{equation}
+with
+\begin{equation}\label{Beta}
+\beta = \frac{\Omega_m(z)^{0.55}}{b(z)}
+\end{equation}
+
+where $\Omega_m$ is the redshift dependent density parameter and $b(z)$ is the linear bias from Equation \ref{bias}. This factor can be used to compute parameters such as dark matter halo mass and duty cycle (the fraction of the time a galaxy shines as a quasar), but it can also give insight about galactic evolution by constraining different feedback models \citep{Hopkins2007a}. This can be seen in Figure \ref{hopkinsbias} \citep{Hopkins2007a} which shows the evolution of bias as a function of redshift. Low-redshift measurements of the bias constrain these models, however they take three drastically different paths at higher redshifts. I would like to measure the bias with our high-redshift quasar candidates in an attempt to constrain these types of models.
+
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\textwidth]{Hopkins_bias.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{The evolution of bias as a function of redshift as given by \citet{Hopkins2007a}. The three panels here all show different types of feedback that are predicted by modeling. My goal is to put a point on this plot at $z \sim$ 4 in an attempt to constrain these models.}}
+	\label{hopkinsbias}
+\end{figure}
+
+
+
+
+\clearpage
+
+\section{Preliminary Results}\label{first_results}
+Before running on the high-redshift candidates, I first need to compare the code that I wrote to well known results from the literature. To compare low-redshift ($2.2\le z$) quasar clustering, I primarily used the results from \citet{Ross2009}, which performed clustering analyses with a sample of $\sim$30,000 quasars covering $\sim$4,000 square degrees in the SDSS footprint. At intermediate-redshift ($2.2\le z \le 2.8$) I compared with \citet{Eftekharzadeh2015} which analyzed $\sim$56,000 quasars over $\sim$7,000 square degrees in the SDSS footprint. Finally, in the high-redshift range I am considering ($2.9 \le z$), I compared to the \citet{Shen2007} results which analyzed $\sim$4,500 quasars spanning $\sim$4,000 square degrees of SDSS. It is important to note, too, that these quasars are all spectroscopically confirmed as opposed to quasar candidates, which is what I use for my calculations.
+
+In addition to the 4,992 high-redshift candidates from our selection, I am also testing my code on low-redshift matches between SpIES and SDSS. In total, I have 7952 confirmed quasars that match to SpIES over its footprint. Figure \ref{test_redshfit_corr} shows the result of my low-redshift test of my redshift-space correlation function code and Figure \ref{highz_redshfit_corr} show the results if I run that code on my high-redshift candidates. My tests appear to be statistically significant at low-redshift (using the jackknife errors on the SpIES data), therefore I am confident that the code returns what I expect. When I run the same code on the high-redshift candidates, however, I find a slightly flatter slope at small scales than \citet{Shen2007}. Further investigation is required here. \citet{Eftekharzadeh2015} suggest that the \citet{Shen2007} peak at small scales could be exaggerated due to observational systematics, however we may also have an issue with the smaller SpIES footprint not accurately sampling the quasar population on smaller scales.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{SpIES_Jackknife_lowz.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{The results of my redshift-space correlation function code (green) on known quasars from SDSS that match to the SpIES field. Shown in blue is a result from \citep{Ross2009} which studied $\sim$30,000 low-redshift quasars in the SDSS footprint. Error bars on the green points are jackknife errors. The SpIES results overlap with that of \citet{Ross2009} giving us high confidence that the code is outputting reasonable results.}}
+	\label{test_redshfit_corr}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{SpIES_Jackknife_highz_specplphot.pdf}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Using the same code as in Figure \ref{test_redshfit_corr}, I generated the redshift space correlation function for the quasar candidates supplied by Gordon. For comparison, I have plotted the \citet{Ross2009} low-redshift data and the \citep{Shen2007} high-redshift results for the redshift space correlation function. The SpIES data is flatter on small scales than the \citet{Shen2007} data, so further tests are required to understand this difference at small scales.}}
+	\label{highz_redshfit_corr}
+\end{figure}
+
+
+With tentative redshift space correlation function results, we can output an estimate of the bias following the steps in \citet{Ross2009}. Combining Equations \ref{bias}, \ref{lin_th}, and \ref{Beta}, we can solve a the quadratic equation for the bias as a function of redshift in terms of the quasar redshift space correlation function and the dark matter correlation function. After combining these equations, we find that the bias takes the form:
+
+\begin{equation}\label{zdep_bias}
+b(z) = \left( \frac{\bar{\xi}_Q(z)}{\bar{\xi}_{DM}(z)} - \frac{4}{45}\Omega^{1.1}(z)\right)^{\frac{1}{2}} - \frac{1}{3}\Omega^{0.55}(z)
+\end{equation}
+where $\bar{\xi}$ is the volume average correlation function \citep{Ross2009}:
+\begin{equation}
+\bar{\xi} = \frac{\int_{s_{min}}^{s_{max}} 4\pi s^2 \xi(s) ds }{\int_{s_{min}}^{s_{max}} 4\pi s^2  ds}
+\end{equation}
+
+Following \citet{Croom2005}, \citet{DaAngela2008}, and \citet{Ross2009}, the integral limits are chosen to be $s_{min}=1h^{-1}$Mpc and $s_{max}=20h^{-1}$Mpc to reduce any nonlinear effects of clustering. Finally, to get an estimate for the bias, we need a value for $\bar{\xi}_{DM}$. To do this, we must to run an N-body code to generate the DM power spectrum, which we can convert into the correlation function by taking the Fourier transform \citep{Smith2003}. I have yet to do this, however \citet{Ross2009} modeled their N-body results as a function of redshift using the equation:
+\begin{equation}
+\bar{\xi}_{DM}(z) = \left(0.2041 \exp(-1.082z) + 0.018 \right)\bar{\xi}_{DM}(z=0)
+\end{equation}
+which was shown to fit well on the scales of interest. Substituting this into Equation \ref{zdep_bias}, we can estimate the bias factor at the average redshift of the survey. 
+
+I did this for both my low-redshift sample and the high-redshift candidates shown in Figure \ref{plot_bias}. I have yet to do any extensive comparisons (I still need errors on this), however I have plotted the bias results from \citet{Ross2009} to show the evolutionary trend with redshift. Using the high-redshift candidates, however, I am getting a bias value of $\sim$2, whereas \citet{Shen2007} found the value to be $\sim$13. A potential reason for this discrepancy is the difference in the power-law slope of the redshift space correlation function at small scales. This change in slope has an effect on the volume averaged correlation function, effectively changing the bias calculation. There is still a lot to do here before anything definitive can be said, however this result leads me to believe that there will be a difference in the two measurements.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.48\textwidth]{First_Cut_Bias_Estimate.pdf}
+	\includegraphics[width=0.48\textwidth]{Bias_candidates.png}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{Left: The low-redshift bias value for SpIES matched to SDSS quasars (red) compared to the \citet{Ross2009} values (blue). Right: The high-redshift candidate bias value (red) is shown with the same \citet{Ross2009} data. A bias that does not grow quickly with redshift implies the DM halos at early times are lower mass \citep{Eftekharzadeh2015}.}}
+	\label{plot_bias}
+\end{figure}
+
+
+Finally, for the low-redshift SDSS-SpIES matches, I was able to compute the 2-dimensional correlation function and the projected correlation function. For comparison, I plot the projected correlation function results from \citet{Eftekharzadeh2015} and \citet{Shen2007}. I find that my low-redshift test has a similar power law slope to the \citet{Eftekharzadeh2015} based upon the fit in Figure \ref{wprp}, which is an encouraging first result as many studies have found similar slopes. I am currently running the code on the high-redshift candidates to compare with the \citet{Shen2007} data which should be available shortly, and I am working on a more rigorous fitting method with errors.
+
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{Test_1Dcorr_JKerr.pdf}
+	%\captionsetup{width=0.75\linewidth}
+	\caption{\footnotesize{The initial results of my projected correlation function code for the low-redshift sample (blue) with the best fit power law shown in yellow on scales fit in the literature. I compare with \citet{Eftekharzadeh2015} (red) and \citet{Shen2007} (green) and find that the power law slopes are similar on the same scale. A better power law fit to the SpIES data and the high-redshift candidate results will be forthcoming shortly. All reported errors are computed using the jackknife technique. }}
+	\label{wprp}
+\end{figure}
+
+\clearpage
+\section{Future Work}\label{future_work}
+One of the most immediate things I would like to do is incorporate SHELA survey \citep{Papovich2011} into my analysis. SHELA is a separate \emph{Spitzer} survey on S82 that observed $\sim$30 square degrees of S82 to depths much deeper than SpIES. The SHELA and SpIES fields overlap (by design) and therefore it will not be difficult to add, giving us a complete stripe of $\sim$130 square degrees of continuous coverage. Hopefully this increase in area will give us more certainty in our results. Next, I need to run my own N-body simulation to determine the dark matter correlation function using the most up-to-date parameters. A potential problem with our bias measurement currently is that we're not comparing directly with simulation, so to reduce error, I'd like to compute my own DM power spectrum. Once I have a measurement of the bias the next step in the literature is to calculate the DM halo masses and duty cycles.
+
+Once I have a clustering pipeline, I can move onto separate clustering analyses. For example, I can determine whether or not quasar clustering is dependent on black hole mass. A several quasar surveys have published estimates of black hole mass, so it would be interesting to see if clustering changes with these mass estimates, and if the DM halo mass remains constant or if it changes. Finally, I also would like to think about doing clustering analyses of Type 2, dust obscured quasars. This population is not well detected in the optical since the light from the accretion disk is obscured by a dusty medium in the way. I am curious to see if the clustering signal is different between these two populations which could have implications regarding differences in evolution between the two types. Some of these goals are extended, but I think most are possible within the graduation time line.
+
+
+%\nocite{*}
+\bibliographystyle{yahapj}
+
+\bibliography{TAC_bib}
+
+\end{document}
