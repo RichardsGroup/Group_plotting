@@ -1,6 +1,7 @@
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-
+import re
 
 #GTR Don't really know what this does
 #JT: This will set the figure size such that it will line up with the text in a LATEX document. I'm not sure it is strictly necessary for pdf's because they should scale properly. This function is used to define the size in the image below, though. To generate a square image you would need to input something like : figsize(0.9,0.9). I typically set the figure size when I define the frame though, so again, its an optional function
@@ -23,22 +24,20 @@ def figsze(hscale,
     fig_size = [fig_width,fig_height]
     return fig_size
 
-#GTR: I want to define this in some sort of preamble
-#JT: Yeah, should be no problem. We just have to decide which parameters we want to change
+###### RC PARAMETERS FOR MATPLOTLIB######
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
 	"axes.linewidth":2.0,
-    "pgf.texsystem": "pdflatex",        # change this if using xetex or lautex
+    #"pgf.texsystem": "pdflatex",        # change this if using xetex or latex
+    "font.family": "sans-serif",
+    "font.sans-serif": ['Helvetica'],         # blank entries should cause plots to inherit fonts from the document
     "text.usetex": True,                # use LaTeX to write all text
-    "font.family": "serif",
-    "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
-    "font.sans-serif": [],
-    "font.monospace": [],
+   	"axes.unicode_minus": False,		#Use ASCII Hyphen instead of unicode minus sign
     "axes.labelsize": 24,               # LaTeX default is 10pt font.
     "axes.labelpad" : 12,				# Distance between label and axis
     "axes.formatter.limits":[-5, 5],	# use sci notation if log10 of axis range is smaller than first or larger than second 
     "axes.formatter.useoffset":False,
-    "text.fontsize": 16,
+    "axes.labelsize": 20,
     "legend.fontsize": 18,               # Make the legend/label fonts a little smaller
     "xtick.labelsize": 24,
     "ytick.labelsize": 24,
@@ -53,10 +52,78 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     'xtick.major.pad':8,
     'ytick.major.pad':8,
     "figure.figsize": figsze(1,1),     # default fig size of 0.9 textwidth
-    "pgf.preamble": [
-        r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it
-        r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
-        ]
+   # "pgf.preamble": [
+    #    r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it
+        #r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
+     #   r"\DeclareUnicodeCharacter{2212}{$-$}"
+      #  ]
     }
 
 mpl.rcParams.update(pgf_with_latex)
+
+
+
+
+
+### PLOT COMMANDS#####
+
+
+## NEW SCATTERPLOT#####
+
+def rgscatter(x,y,pkwargs={},fill=True):
+	pkwargs.setdefault('marker', '.')
+	pkwargs.setdefault('s', 1)
+	pkwargs.setdefault('color', 'k')
+	if fill== False:
+		pkwargs.setdefault('facecolors', 'none') #Make open points
+	if fill==True:
+		pkwargs.setdefault('edgecolors', 'none') #Get rid of edge colors	
+	P = plt.scatter(x,y,**pkwargs)
+	
+	return P
+	
+
+
+## NEW LINE PLOT#####
+
+def rgplot(x,y,pkwargs={},type = 'solid'):
+	pkwargs.setdefault('linewidth', 2)
+	pkwargs.setdefault('color', 'k')
+	if type == 'dot-dash':
+		pkwargs.setdefault('dashes', (3,5,10,5))
+	if type == 'dash-dot':
+		pkwargs.setdefault('dashes', (3,5,10,5))
+	if type == 'dash':
+		pkwargs.setdefault('dashes', (10,10))
+	if type == 'dot':
+		pkwargs.setdefault('dashes', (1,3,1,3))
+	
+	
+	
+	P = plt.plot(x,y,**pkwargs)
+	return P
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
