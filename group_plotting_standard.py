@@ -2,6 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import re
+import scipy.stats as stats
 
 #GTR Don't really know what this does
 #JT: This will set the figure size such that it will line up with the text in a LATEX document. I'm not sure it is strictly necessary for pdf's because they should scale properly. This function is used to define the size in the image below, though. To generate a square image you would need to input something like : figsize(0.9,0.9). I typically set the figure size when I define the frame though, so again, its an optional function
@@ -23,24 +24,23 @@ def figsze(hscale,
     fig_height = fig_width*vscale                   # height in inches
     fig_size = [fig_width,fig_height]
     return fig_size
-
+import scipy.stats as stats
 ###### RC PARAMETERS FOR MATPLOTLIB######
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
-	"axes.linewidth":2.0,
+    "axes.linewidth":2.0,
     #"pgf.texsystem": "pdflatex",        # change this if using xetex or latex
     "font.family": "sans-serif",
-    "font.sans-serif": ['Helvetica'],         # blank entries should cause plots to inherit fonts from the document
-    "text.usetex": True,                # use LaTeX to write all text
-   	"axes.unicode_minus": False,		#Use ASCII Hyphen instead of unicode minus sign
-    "axes.labelsize": 24,               # LaTeX default is 10pt font.
-    "axes.labelpad" : 12,				# Distance between label and axis
+    "font.sans-serif": ['Helvetica'],    # blank entries should cause plots to inherit fonts from the document
+    #"text.usetex": True,                # use LaTeX to write all text
+    "axes.unicode_minus": False,	#Use ASCII Hyphen instead of unicode minus sign
+    "axes.labelsize": 20,               # LaTeX default is 10pt font.
+    #"axes.labelpad" : 12,		# Distance between label and axis
     "axes.formatter.limits":[-5, 5],	# use sci notation if log10 of axis range is smaller than first or larger than second 
     "axes.formatter.useoffset":False,
-    "axes.labelsize": 20,
     "legend.fontsize": 18,               # Make the legend/label fonts a little smaller
-    "xtick.labelsize": 24,
-    "ytick.labelsize": 24,
+    "xtick.labelsize": 20,
+    "ytick.labelsize": 20,
     'xtick.major.width':1, 
     'xtick.minor.width':1, 
     'ytick.major.width':1, 
@@ -85,7 +85,7 @@ def rgscatter(x,y,pkwargs={},fill=True):
 
 
 ## NEW LINE PLOT#####
-
+import scipy.stats as stats
 def rgplot(x,y,pkwargs={},type = 'solid'):
 	pkwargs.setdefault('linewidth', 2)
 	pkwargs.setdefault('color', 'k')
@@ -103,8 +103,32 @@ def rgplot(x,y,pkwargs={},type = 'solid'):
 	P = plt.plot(x,y,**pkwargs)
 	return P
 	
-	
-	
+
+## NEW CONTOUR PLOT#####
+
+def rgcontour(xdat,ydat,ckwargs={},skwargs={}):
+	xmin = min(xdat)
+	xmax = max(xdat)
+	ymin = min(ydat)
+	ymax = max(ydat)
+
+	X, Y = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+	positions = np.vstack([X.ravel(), Y.ravel()])
+	values = np.vstack([xdat, ydat])
+	kernel = stats.gaussian_kde(values)
+	Z = np.reshape(kernel(positions).T, X.shape)
+
+	CS = plt.contour(X,Y,Z,**ckwargs)
+	threshold = CS.levels[0]
+	z = kernel(values)
+
+	# mask points above density threshold
+	x = np.ma.masked_where(z > threshold, xdat)
+	y = np.ma.masked_where(z > threshold, ydat)
+
+	# plot unmasked points
+	CS = rgscatter(x, y,pkwargs = skwargs)
+	return CS
 	
 	
 	
